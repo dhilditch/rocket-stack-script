@@ -73,7 +73,7 @@ add-apt-repository universe -y
 add-apt-repository ppa:certbot/certbot -y
 apt-get update -y
 apt-get install python-certbot-nginx -y
-certbot --nginx
+certbot --nginx --non-interactive --agree-tos 
 service nginx restart
 
 #wordpress installation
@@ -87,7 +87,7 @@ wp core download --allow-root
 chown www-data:www-data * -R
 wp core config --dbhost=localhost --dbname=wp_ --dbuser=rs --dbpass=$DBPASSWORD --allow-root
 chmod 644 wp-config.php
-wp core install --url="https://${SITEURL}" --title="Rocket Stack Installation by www.wpintense.com" --admin_name=rsadmin --admin_password=$WPADMINPASSWORD --admin_email=you@example.com
+wp core install --url="https://${SITEURL}" --title="Rocket Stack Installation by www.wpintense.com" --admin_name=rsadmin --admin_password=$WPADMINPASSWORD --admin_email=you@example.com  --allow-root
 
 #wget https://wordpress.org/latest.zip -P /var/www/
 #unzip /var/www/latest.zip -d /var/www/
