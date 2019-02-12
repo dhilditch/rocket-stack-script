@@ -3,7 +3,7 @@
 
 DBPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c32)"
 WPADMINPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c8)"
-echo "Which URL should I configure this build for? (include www. if appropriate)"
+echo "Which URL should I configure this build for? (e.g. www.wpintense.com)"
 read SITEURL
 
 echo "$DBPASSWORD" > dbpassword.txt
@@ -46,22 +46,15 @@ service nginx restart
 
 #mysql config
 mysql -e "CREATE DATABASE rocketstack;"
-mysql -e "CREATE USER 'rs'@'localhost' BY 'CHOOSEASTRONGPASSWORD';"
+mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED BY 'CHOOSEASTRONGPASSWORD';"
 mysql -e "GRANT ALL PRIVILEGES ON rocketstack.* TO'rs'@'localhost';"
 
-#wordpress installation
-wget https://wordpress.org/latest.zip -P /var/www/
-unzip /var/www/latest.zip -d /var/www/
-mv /var/www/wordpress /var/www/rocketstack
-chown www-data:www-data /var/www/rocketstack -R
-rm /var/www/latest.zip
-
 #mysql innodb config
-echo "innodb_buffer_pool_size = 200M" > /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "innodb_buffer_pool_instances = 8" > /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "innodb_io_capacity = 5000" > /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "max_binlog_size = 100M" > /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "expire_logs_days = 3" > /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "innodb_buffer_pool_size = 200M" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "innodb_buffer_pool_instances = 8" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "innodb_io_capacity = 5000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "max_binlog_size = 100M" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "expire_logs_days = 3" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 service mysql restart
 
 #config php.ini
@@ -75,12 +68,36 @@ sed -i 's/^pm.max_children = 5/pm.max_children = 25/gi' /etc/php/7.2/fpm/pool.d/
 
 service php7.2-fpm restart
 
-#TODO: run wpcli to run wordpress installation screens
-#apt-get install software-properties-common -y
-#add-apt-repository universe -y
-#add-apt-repository ppa:certbot/certbot -y
-#apt-get update -y
-#apt-get install python-certbot-nginx -y
-#certbot --nginx
+apt-get install software-properties-common -y
+add-apt-repository universe -y
+add-apt-repository ppa:certbot/certbot -y
+apt-get update -y
+apt-get install python-certbot-nginx -y
+certbot --nginx
+service nginx restart
+
+#wordpress installation
+wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+mv wp-cli.phar /usr/local/bin/wp
+mkdir /var/www/rocketstack
+chown www-data:www-data /var/www/rocketstack
+cd /var/www/rocketstack
+wp core download --allow-root
+chown www-data:www-data * -R
+wp core config --dbhost=localhost --dbname=wp_ --dbuser=rs --dbpass=$DBPASSWORD --allow-root
+chmod 644 wp-config.php
+wp core install --url="https://${SITEURL}" --title="Rocket Stack Installation by www.wpintense.com" --admin_name=rsadmin --admin_password=$WPADMINPASSWORD --admin_email=you@example.com
+
+#wget https://wordpress.org/latest.zip -P /var/www/
+#unzip /var/www/latest.zip -d /var/www/
+#mv /var/www/wordpress /var/www/rocketstack
+#chown www-data:www-data /var/www/rocketstack -R
+#rm /var/www/latest.zip
 
 #mysql_secure_installation # choose y for everything and enter a secure root password
+echo "You can now log in through https://${SITEURL}/wp-login.php"
+echo "Username: rsadmin";
+echo "Password: $WPADMINPASSWORD";
+
+
