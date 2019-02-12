@@ -3,6 +3,10 @@
 
 DBPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c32)"
 WPADMINPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c8)"
+
+echo "What is your email address? (needed for SSL cert and wp-admin setup)"
+read ADMINEMAIL
+
 echo "Which URL should I configure this build for? (e.g. www.wpintense.com)"
 read SITEURL
 
@@ -39,7 +43,7 @@ rm /etc/nginx/sites-enabled/default
 rm /etc/nginx/sites-available/default
 mkdir /var/www/cache
 chown www-data:www-data /var/www/cache/
-#TODO: change server_name variable to domain name of website inc www
+#change server_name variable to domain name of website inc www
 sed -i "s/server_name _;/server_name $SITEURL;/gi" /etc/nginx/sites-available/rocketstack.conf
 
 service nginx restart
@@ -74,7 +78,7 @@ add-apt-repository universe -y
 add-apt-repository ppa:certbot/certbot -y
 apt-get update -y
 apt-get install python-certbot-nginx -y
-certbot --nginx --non-interactive --agree-tos 
+certbot --nginx --non-interactive --agree-tos --email $ADMINEMAIL --domains $SITEURL
 service nginx restart
 
 #wordpress installation
@@ -88,7 +92,8 @@ wp core download --allow-root
 chown www-data:www-data * -R
 wp core config --dbhost=localhost --dbname=rocketstack --dbuser=rs --dbpass=$DBPASSWORD --allow-root
 chmod 644 wp-config.php
-wp core install --url="https://${SITEURL}" --title="Rocket Stack Installation by www.wpintense.com" --admin_name=rsadmin --admin_password=$WPADMINPASSWORD --admin_email=you@example.com  --allow-root
+wp core install --url="https://${SITEURL}" --title="Rocket Stack Installation by www.wpintense.com" --admin_name=rsadmin --admin_password=$WPADMINPASSWORD --admin_email=$ADMINEMAIL  --allow-root
+chown www-data:www-data /var/www/rocketstack -R
 
 #wget https://wordpress.org/latest.zip -P /var/www/
 #unzip /var/www/latest.zip -d /var/www/
