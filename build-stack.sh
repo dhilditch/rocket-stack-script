@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+export DEBIAN_FRONTEND=noninteractive
 wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
 apt-get update -y
 apt-get upgrade -y
