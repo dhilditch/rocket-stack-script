@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# created by Dave Hilditch @ www.wpintense.com
 
 DBPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c32)"
 WPADMINPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c8)"
