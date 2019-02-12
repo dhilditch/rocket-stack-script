@@ -40,7 +40,7 @@ rm /etc/nginx/sites-available/default
 mkdir /var/www/cache
 chown www-data:www-data /var/www/cache/
 #TODO: change server_name variable to domain name of website inc www
-sed -i "s/server_name _;/server_name $SITEURL;" /etc/nginx/sites-available/rocketstack.conf
+sed -i "s/server_name _;/server_name $SITEURL;/gi" /etc/nginx/sites-available/rocketstack.conf
 
 service nginx restart
 
