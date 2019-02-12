@@ -4,7 +4,7 @@ wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
 apt-get update -y
 apt-get upgrade -y
 apt-get install debconf-utils -y
-echo "mysql-server-5.5 mysql-server/root_password_again password" | debconf-set-selections
+echo "mysql-community-server  mysql-server/default-auth-override      select  Use Strong Password Encryption (RECOMMENDED)" | debconf-set-selections
 apt-get install mysql-server -y # accept all defaults
 apt-get install php7.2 -y
 apt-get purge apache2 -y
