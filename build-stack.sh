@@ -46,8 +46,9 @@ service nginx restart
 
 #mysql config
 mysql -e "CREATE DATABASE rocketstack;"
-mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED BY 'CHOOSEASTRONGPASSWORD';"
-mysql -e "GRANT ALL PRIVILEGES ON rocketstack.* TO'rs'@'localhost';"
+#mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED WITH mysql_native_password BY 'MIRRR7Zl6gMFntIruhBsHMhgAXfD7BZL';"
+mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED BY '${DBPASSWORD}';"
+mysql -e "GRANT ALL PRIVILEGES ON rocketstack.* TO 'rs'@'localhost';"
 
 #mysql innodb config
 echo "innodb_buffer_pool_size = 200M" >> /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -85,7 +86,7 @@ chown www-data:www-data /var/www/rocketstack
 cd /var/www/rocketstack
 wp core download --allow-root
 chown www-data:www-data * -R
-wp core config --dbhost=localhost --dbname=wp_ --dbuser=rs --dbpass=$DBPASSWORD --allow-root
+wp core config --dbhost=localhost --dbname=rocketstack --dbuser=rs --dbpass=$DBPASSWORD --allow-root
 chmod 644 wp-config.php
 wp core install --url="https://${SITEURL}" --title="Rocket Stack Installation by www.wpintense.com" --admin_name=rsadmin --admin_password=$WPADMINPASSWORD --admin_email=you@example.com  --allow-root
 
