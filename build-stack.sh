@@ -4,7 +4,10 @@
 DBPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c32)"
 WPADMINPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c8)"
 echo "Which URL should I configure this build for? (include www. if appropriate)"
-readvar SITEURL
+read SITEURL
+
+echo "$DBPASSWORD" > dbpassword.txt
+echo "$WPADMINPASSWORD" > wpadminpassword.txt
 
 export DEBIAN_FRONTEND=noninteractive
 wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
