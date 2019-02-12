@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
-dpkg -i mysql-apt-config_0.8.10-1_all.deb -y
+dpkg -i mysql-apt-config_0.8.10-1_all.deb
 apt-get update -y
 apt-get upgrade -y
 apt-get install debconf-utils -y
