@@ -50,8 +50,7 @@ service nginx restart
 
 #mysql config
 mysql -e "CREATE DATABASE rocketstack;"
-#mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED WITH mysql_native_password BY 'MIRRR7Zl6gMFntIruhBsHMhgAXfD7BZL';"
-mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED BY '${DBPASSWORD}';"
+mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DBPASSWORD}';"
 mysql -e "GRANT ALL PRIVILEGES ON rocketstack.* TO 'rs'@'localhost';"
 
 #mysql innodb config
