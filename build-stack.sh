@@ -30,8 +30,8 @@ apt-get install -y redis
 apt-get install -y fail2ban
 
 #redis config
-echo "maxmemory 300mb" > /etc/redis/redis.conf
-echo "maxmemory-policy allkeys-lru" > /etc/redis/redis.conf
+echo "maxmemory 300mb" >> /etc/redis/redis.conf
+echo "maxmemory-policy allkeys-lru" >> /etc/redis/redis.conf
 
 sed -i 's/^save /#save /gi' /etc/redis/redis.conf
 
