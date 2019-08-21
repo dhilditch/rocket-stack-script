@@ -18,43 +18,22 @@ echo "$WPADMINPASSWORD" > wpadminpassword.txt
 #git clone https://github.com/dhilditch/wpintense-rocket-stack-ubuntu18-wordpress /root/rsconfig
 #cp /root/rsconfig/nginx/* /etc/nginx/ -R
 
-ln -s /etc/nginx/sites-available/rocketstack.conf /etc/nginx/sites-enabled/
-mkdir /var/www/SITEURL/cache
-chown www-data:www-data /var/www/SITEURL/cache/
+cp /etc/nginx/sites-available/rocketstack.conf /etc/nginx/sites-available/$SITEURL.conf
+ln -s /etc/nginx/sites-available/$SITEURL.conf /etc/nginx/sites-enabled/
+mkdir /var/www/$SITEURL/cache
+chown www-data:www-data /var/www/$SITEURL/cache/
 #change server_name variable to domain name of website inc www
-sed -i "s/server_name _;/server_name $SITEURL;/gi" /etc/nginx/sites-available/rocketstack.conf
+sed -i "s/server_name _;/server_name $SITEURL;/gi" /etc/nginx/sites-available/$SITEURL.conf
 
 service nginx restart
 
 #mysql config
-mysql -e "CREATE DATABASE rocketstack;"
+mysql -e "CREATE DATABASE SITEURL;"
 mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DBPASSWORD}';"
 mysql -e "GRANT ALL PRIVILEGES ON rocketstack.* TO 'rs'@'localhost';"
 
-#mysql innodb config
-echo "innodb_buffer_pool_size = 200M" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "innodb_buffer_pool_instances = 8" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "innodb_io_capacity = 5000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "max_binlog_size = 100M" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-echo "expire_logs_days = 3" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-service mysql restart
 
-#config php.ini
-sed -i 's/^max_execution_time = 30/max_execution_time = 600/gi' /etc/php/7.2/fpm/php.ini
-sed -i 's/^memory_limit = 128M/memory_limit = 512M/gi' /etc/php/7.2/fpm/php.ini
-sed -i 's/^upload_max_filesize = 2M/upload_max_filesize = 20M/gi' /etc/php/7.2/fpm/php.ini
 
-#config www.conf
-sed -i 's/^pm = dynamic/pm = static/gi' /etc/php/7.2/fpm/pool.d/www.conf
-sed -i 's/^pm.max_children = 5/pm.max_children = 25/gi' /etc/php/7.2/fpm/pool.d/www.conf
-
-service php7.2-fpm restart
-
-apt-get install software-properties-common -y
-add-apt-repository universe -y
-add-apt-repository ppa:certbot/certbot -y
-apt-get update -y
-apt-get install python-certbot-nginx -y
 certbot --nginx --non-interactive --agree-tos --email $ADMINEMAIL --domains $SITEURL
 service nginx restart
 
