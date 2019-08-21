@@ -4,11 +4,14 @@
 DBPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c32)"
 WPADMINPASSWORD="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c8)"
 
-echo "Adresse mail à utiliser ? (needed for SSL cert and wp-admin setup)"
+echo "Adresse mail à utiliser ? (utilisée pour le certificat SSL wp-admin)"
 read ADMINEMAIL
 
-echo "Which URL should I configure this build for? (e.g. www.wpintense.com)"
+echo "quelle sera l\'URL du site? "
 read SITEURL
+
+echo "definir un nom d\'utilisateur pour la base de donnée :"
+read DBUSER
 
 echo "$DBPASSWORD" > dbpassword.txt
 echo "$WPADMINPASSWORD" > wpadminpassword.txt
@@ -28,9 +31,9 @@ sed -i "s/server_name _;/server_name $SITEURL;/gi" /etc/nginx/sites-available/$S
 service nginx restart
 
 #mysql config
-mysql -e "CREATE DATABASE SITEURL;"
-mysql -e "CREATE USER 'rs'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DBPASSWORD}';"
-mysql -e "GRANT ALL PRIVILEGES ON rocketstack.* TO 'rs'@'localhost';"
+mysql -e "CREATE DATABASE $DBUSER;"
+mysql -e "CREATE USER '$DBUSER'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DBPASSWORD}';"
+mysql -e "GRANT ALL PRIVILEGES ON $DBUSER.* TO '$DBUSER'@'localhost';"
 
 
 
@@ -38,9 +41,7 @@ certbot --nginx --non-interactive --agree-tos --email $ADMINEMAIL --domains $SIT
 service nginx restart
 
 #wordpress installation
-wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-chmod +x wp-cli.phar
-mv wp-cli.phar /usr/local/bin/wp
+
 mkdir /var/www/rocketstack
 chown www-data:www-data /var/www/rocketstack
 cd /var/www/rocketstack
